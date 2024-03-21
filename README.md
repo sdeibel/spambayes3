@@ -44,7 +44,64 @@ other forms.
 
 ### Installing
 
-To be written soon...
+To install this you need to copy the following directories:
+
+* Copy the spambayes directory into the site-packages for your Python
+* Place scripts/sb_* into a directory on your path, such as /usr/local/bin
+
+Once installed, you can set up your configuration.  First configure spambayes
+with the following in .spambayesrc in your home directory:
+
+```
+[Storage]
+persistent_use_database=True
+persistent_storage_file=~/.hammiedb
+```
+
+Then you can set up a .procmailrc like something like this (your paths
+will vary):
+
+:0 fw:hamlock
+| /usr/bin/sb_filter.py
+:0 :spambayeslock
+* ^X-Spambayes-Classification: spam
+/home/username/mail/spam-bayes
+
+Then the idea is that this filters out spam into the folder spam-bayes using
+the classification database .hammiedb. You build up that database over time
+by placing email into a spam folder, or a ham folder if you're trying to
+retrain spambayes to not identify something as spam. The a cron task runs
+sb_mboxtrain.py to process those emails to train the database.
+
+You'll need to create those two SPAM and HAM folders in your mail directory,
+for example ~/mail/NEW-HAM and ~/mail/NEW-SPAM.
+
+The you'll need a script spambayes-train to run the training process,
+something like this (which is a fabricated clunky example from a larger
+script that does this for multiple users):
+
+```
+#!/bin/bash
+/usr/local/bin/sb_mboxtrain.py -d /home/uname/.hammiedb -s /home/uname/mail/NEW-SPAM
+/usr/local/bin/sb_mboxtrain.py -d /home/uname/.hammiedb -g /home/uname/mail/NEW-HAM
+rm -f /home/uname/mail/NEW-SPAM /home/uname/mail/NEW-HAM
+touch /home/uname/mail/NEW-SPAM /home/uname/mail/NEW-HAM
+# If you're running this as root you will also need:
+chown uname /home/uname/mail/NEW-SPAM /home/uname/mail/NEW-HAM
+chgrp uname /home/uname/mail/NEW-SPAM /home/uname/mail/NEW-HAM
+```
+
+If you want to run this using cron, this entry in /etc/cron.d would invoke it
+every 5 minutes:
+
+```
+0, 5,10,15,20,25,30,35,40,45,50,55 * * * * root /usr/local/bin/cronic /usr/local/bin/spambayes-train
+```
+
+This uses cronic to avoid sending emails with useless status information every
+five minutes.  A copy is included in this repository.
+
+Obviously, there are many other ways to configure this to run sb_mboxtrain.py.
 
 ### More information
 

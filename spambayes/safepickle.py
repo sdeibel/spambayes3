@@ -5,12 +5,7 @@ import sys
 import os
 import pickle as pickle
 
-# Some systems have filelock in dist-packages
-# If importing spambayes3/filelock fails, import system version
-try:
-    from filelock import filelock
-except:
-    import filelock
+from spambayes import filelock
 
 from spambayes.Options import options
 
