@@ -74,20 +74,20 @@ __author__ = "Tim Stone <tim@fourstonesExpressions.com>"
 __credits__ = "Mark Hammond, Tony Meyer, all the spambayes contributors."
 
 import sys
-import types
+import io
 import time
 import math
 import re
 import errno
 import shelve
 import warnings
-import pickle as pickle
+import pickle
 import traceback
 
-import email.Message
-import email.Parser
-import email.Header
-import email.Generator
+import email
+import email.parser
+import email.header
+import email.generator
 
 from spambayes import storage
 from spambayes import dbmstorage
@@ -96,9 +96,9 @@ from spambayes.Options import options
 from spambayes.safepickle import pickle_read, pickle_write
 
 try:
-    import io as StringIO
+    from io import StringIO
 except ImportError:
-    import io
+    import io as StringIO
 
 CRLF_RE = re.compile(r'\r\n|\r|\n')
 
@@ -316,7 +316,7 @@ def database_type():
     return nm, typ
 
 
-class Message(object, email.message.EmailMessage):
+class Message(email.message.EmailMessage):
     '''An email.message.EmailMessage extended for SpamBayes'''
 
     def __init__(self, id=None):
@@ -358,33 +358,6 @@ class Message(object, email.message.EmailMessage):
         self._set_class_message_info_db(value)
     message_info_db = property(_get_message_info_db, _set_message_info_db)
 
-    # This function (and it's hackishness) can be avoided by using
-    # email.message_from_string(text, _class=SBHeaderMessage)
-    # i.e. instead of doing this:
-    #   >>> msg = spambayes.message.SBHeaderMessage()
-    #   >>> msg.setPayload(substance)
-    # you do this:
-    #   >>> msg = email.message_from_string(substance, _class=SBHeaderMessage)
-    # imapfilter has an example of this in action
-    def setPayload(self, payload):
-        """DEPRECATED.
-
-        This function does not work (as a result of using private
-        methods in a hackish way) in Python 2.4, so is now deprecated.
-        Use *_from_string as described above.
-
-        More: Python 2.4 has a new email package, and the private functions
-        are gone.  So this won't even work.  We have to do something to
-        get this to work, for the 1.0.x branch, so use a different ugly
-        hack.
-        """
-        warnings.warn("setPayload is deprecated. Use " \
-                      "email.message_from_string(payload, _class=" \
-                      "Message) instead.",
-                      DeprecationWarning, 2)
-        new_me = email.message_from_string(payload, _class=Message)
-        self.__dict__.update(new_me.__dict__)
-
     def setId(self, id):
         if self.id and self.id != id:
             raise ValueError(("MsgId has already been set,"
@@ -415,21 +388,24 @@ class Message(object, email.message.EmailMessage):
         """Make sure data uses CRLF for line termination."""
         return CRLF_RE.sub('\r\n', data)
 
-    def as_string(self, unixfrom=False, mangle_from_=True):
-        # The email package stores line endings in the "internal" Python
-        # format ('\n').  It is up to whoever transmits that information to
-        # convert to appropriate line endings (according to RFC822, that is
-        # \r\n *only*).  imaplib *should* take care of this for us (in the
-        # append function), but does not, so we do it here
+    def as_bytes(self, unixfrom=False, policy=None):
+        '''Generate a bytes version of the message'''
         try:
-            fp = io.StringIO()
-            g = email.Generator.Generator(fp, mangle_from_=mangle_from_)
-            g.flatten(self, unixfrom)
-            return self._force_CRLF(fp.getvalue())
+            return super().as_bytes(unixfrom=unixfrom, policy=policy)
         except TypeError:
             parts = []
             for part in self.get_payload():
-                parts.append(email.message.EmailMessage.as_string(part, unixfrom))
+                parts.append(email.message.EmailMessage.as_bytes(part, unixfrom=unixfrom, policy=policy))
+            return self._force_CRLF(b"\n".join(parts)).encode('utf-8')
+
+    def as_string(self, unixfrom=False, policy=None):
+        '''Generate a string version of the message'''
+        try:
+            return super().as_string(unixfrom=unixfrom, policy=policy)
+        except TypeError:
+            parts = []
+            for part in self.get_payload():
+                parts.append(email.message.EmailMessage.as_string(part, unixfrom=unixfrom, policy=policy))
             return self._force_CRLF("\n".join(parts))
 
     def modified(self):
@@ -480,19 +456,13 @@ class Message(object, email.message.EmailMessage):
 class SBHeaderMessage(Message):
     '''Message class that is cognizant of SpamBayes headers.
     Adds routines to add/remove headers for SpamBayes'''
-    def setPayload(self, payload):
-        """DEPRECATED.
-        """
-        warnings.warn("setPayload is deprecated. Use " \
-                      "email.message_from_string(payload, _class=" \
-                      "SBHeaderMessage) instead.",
-                      DeprecationWarning, 2)
-        new_me = email.message_from_string(payload, _class=SBHeaderMessage)
-        self.__dict__.update(new_me.__dict__)
 
     def setIdFromPayload(self):
         try:
-            self.setId(self[options['Headers', 'mailid_header_name']])
+            id = self[options['Headers', 'mailid_header_name']]
+            if id is not None:
+                id = str(id)
+            self.setId(id)
         except ValueError:
             return None
 
@@ -538,29 +508,30 @@ class SBHeaderMessage(Message):
                 if (word == '*H*' or word == '*S*' \
                     or score <= hco or score >= sco):
                     if isinstance(word, str):
-                        word = email.Header.Header(word,
+                        word = email.header.Header(word,
                                                    charset='utf-8').encode()
                     try:
                         evd.append("%r: %.2f" % (word, score))
                     except TypeError:
                         evd.append("%r: %s" % (word, score))
 
-            # Line-wrap this header, because it can get very long.  We don't
-            # use email.Header.Header because that can explode with unencoded
-            # non-ASCII characters.  We can't use textwrap because that's 2.3.
-            wrappedEvd = []
+            # # Line-wrap this header, because it can get very long.  We don't
+            # # use email.header.Header because that can explode with unencoded
+            # # non-ASCII characters.
+            # wrappedEvd = []
             headerName = options['Headers', 'evidence_header_name']
-            lineLength = len(headerName) + len(': ')
-            for component, index in zip(evd, list(range(len(evd)))):
-                wrappedEvd.append(component)
-                lineLength += len(component)
-                if index < len(evd)-1:
-                    if lineLength + len('; ') + len(evd[index+1]) < 78:
-                        wrappedEvd.append('; ')
-                    else:
-                        wrappedEvd.append(';\n\t')
-                        lineLength = 8
-            self[headerName] = "".join(wrappedEvd)
+            # lineLength = len(headerName) + len(': ')
+            # for index, component in enumerate(evd):
+            #     wrappedEvd.append(component)
+            #     lineLength += len(component)
+            #     if index < len(evd)-1:
+            #         if lineLength + len('; ') + len(evd[index+1]) < 78:
+            #             wrappedEvd.append('; ')
+            #         else:
+            #             wrappedEvd.append(';\n\t')
+            #             lineLength = 8
+            # self[headerName] = "".join(wrappedEvd)
+            self[headerName] = ';'.join(evd)
 
         if options['Headers', 'add_unique_id']:
             self[options['Headers', 'mailid_header_name']] = self.id
@@ -687,15 +658,14 @@ def insert_exception_header(string_msg, msg_id=None):
 
     Returns a tuple of the new message text and the exception details."""
     stream = io.StringIO()
-    traceback.print_exc(None, stream)
+    try:
+        raise Exception('Test')
+    except:
+        traceback.print_exc(None, stream)
     details = stream.getvalue()
 
-    # Build the header.  This will strip leading whitespace from
-    # the lines, so we add a leading dot to maintain indentation.
-    detailLines = details.strip().split('\n')
-    dottedDetails = '\n.'.join(detailLines)
     headerName = 'X-Spambayes-Exception'
-    header = email.Header.Header(dottedDetails, header_name=headerName)
+    header = email.header.Header(details, header_name=headerName)
 
     # Insert the exception header, and optionally also insert the id header,
     # otherwise we might keep doing this message over and over again.

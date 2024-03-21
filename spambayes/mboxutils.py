@@ -177,8 +177,10 @@ def get_message(obj):
     # Create an email Message object.
     if hasattr(obj, "read"):
         obj = obj.read()
+    if not isinstance(obj, str):
+        obj = obj.as_string()
     try:
-        msg = email.message_from_string(obj,policy=email.policy.default)
+        msg = email.message_from_string(obj ,policy=email.policy.default)
     except email.errors.MessageParseError:
         # Wrap the raw text in a bare Message object.  Since the
         # headers are most likely damaged, we can't use the email

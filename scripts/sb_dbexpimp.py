@@ -82,16 +82,17 @@ import csv
 import spambayes.storage
 from spambayes.Options import options
 import sys, os, getopt, errno
-from types import UnicodeType
 
 def uquote(s):
-    if isinstance(s, UnicodeType):
-        s = s.encode('utf-8')
+    if isinstance(s, bytes):
+        s = s.decode('utf-8')
     return s
 
 # Heaven only knows what encoding non-ASCII stuff will be in
 # Try a few common western encodings and punt if they all fail
 def uunquote(s):
+    if isinstance(s, str):
+        return s
     for encoding in ("utf-8", "cp1252", "iso-8859-1"):
         try:
             return str(s, encoding)
@@ -109,7 +110,7 @@ def runExport(dbFN, useDBM, outFN):
         words = list(bayes.wordinfo.keys())
 
     try:
-        fp = open(outFN, 'wb')
+        fp = open(outFN, 'w')
     except IOError as e:
         if e.errno != errno.ENOENT:
             raise
@@ -142,7 +143,7 @@ def runImport(dbFN, useDBM, newDBM, inFN):
 
     bayes = spambayes.storage.open_storage(dbFN, useDBM)
 
-    fp = open(inFN, 'rb')
+    fp = open(inFN, 'r')
     rdr = csv.reader(fp)
     (nham, nspam) = next(rdr)
 

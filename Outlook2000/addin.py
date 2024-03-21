@@ -4,7 +4,6 @@ import types
 import warnings
 import traceback
 import winreg
-from types import UnicodeType
 
 # *sigh* - this is for the binary installer, and for the sake of one line
 # that is implicit anyway, I gave up
@@ -509,7 +508,7 @@ def GetClues(mgr, msgstore_message):
             nspam = record.spamcount
         else:
             nham = nspam = "-"
-        if isinstance(word, UnicodeType):
+        if isinstance(word, str):
             word = word.encode('mbcs', 'replace')
         else:
             word = repr(word)
@@ -540,7 +539,7 @@ def GetClues(mgr, msgstore_message):
     # However, <code> does not require escaping.
     # could use pprint, but not worth it.
     for token in toks:
-        if isinstance(token, UnicodeType):
+        if isinstance(token, str):
             token = token.encode('mbcs', 'replace')
         else:
             token = repr(token)

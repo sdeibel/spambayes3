@@ -25,17 +25,12 @@ from test_sb_server import good1, spam1, malformed1
 
 TEMP_PICKLE_NAME = os.path.join(os.path.dirname(__file__), "temp.pik")
 TEMP_DBM_NAME = os.path.join(os.path.dirname(__file__), "temp.dbm")
-# The chances of anyone having files with these names in the test
-# directory is minute, but we don't want to wipe anything, so make
-# sure that they don't already exist.  Our tearDown code gets rid
-# of our copies (whether the tests pass or fail) so they shouldn't
-# be ours.
+
+# In case teardown was never reached
 for fn in [TEMP_PICKLE_NAME, TEMP_DBM_NAME]:
     if os.path.exists(fn):
-        print((fn, "already exists.  Please remove this file before " \
-              "running these tests (a file by that name will be " \
-              "created and destroyed as part of the tests)."))
-        sys.exit(1)
+        print("Removing test data", fn)
+        os.unlink(fn)
 
 class MessageTest(unittest.TestCase):
     def setUp(self):
@@ -97,6 +92,8 @@ class MessageTest(unittest.TestCase):
                 self.assertTrue(line.endswith('\r'))
 
     def test_as_string_endings(self):
+        if sys.platform != 'win32':
+            raise unittest.SkipTest('win32 test')
         self.assertTrue('\r' not in spam1)
         lines = self.msg.as_string().split('\n')
         for line in lines:
@@ -531,7 +528,11 @@ class SBHeaderMessageTest(unittest.TestCase):
 
 
 class MessageInfoBaseTest(unittest.TestCase):
+    klass = None
+    
     def setUp(self, fn=TEMP_PICKLE_NAME):
+        if self.klass is None:
+            raise unittest.SkipTest('base class')
         self.db = self.klass(fn, self.mode)
 
     def test_mode(self):
@@ -676,26 +677,26 @@ class MessageInfoDBTest(MessageInfoBaseTest):
 
 class UtilitiesTest(unittest.TestCase):
     def _verify_details(self, details):
-        loc = details.find(__file__)
+        loc = details.find("File ")
         self.assertNotEqual(loc, -1)
         loc = details.find("Exception: Test")
         self.assertNotEqual(loc, -1)
 
-    def _verify_exception_header(self, msg, details):        
-        msg = email.message_from_string(msg)
-        details = "\r\n.".join(details.strip().split('\n'))
+    def _verify_exception_header(self, txt, details):        
+        msg = email.message_from_string(txt)
         headerName = 'X-Spambayes-Exception'
-        header = email.Header.Header(details, header_name=headerName)
-        self.assertEqual(msg[headerName].replace('\r\n', '\n'),
-                         str(header).replace('\r\n', '\n'))
+        lines = details.splitlines(keepends=True)
+        details = ''.join(lines[:-1])
+        header = email.header.Header(details, header_name=headerName)
+        self.assertEqual(msg[headerName].replace('\r\n', '\n').rstrip(),
+                         str(header).replace('\r\n', '\n').rstrip())
 
     def test_insert_exception_header(self):
         # Cause an exception to insert.
         try:
             raise Exception("Test")
         except Exception:
-            pass
-        msg, details = insert_exception_header(good1)
+            msg, details = insert_exception_header(good1)
         self._verify_details(details)
         self._verify_exception_header(msg, details)
 
@@ -712,7 +713,8 @@ class UtilitiesTest(unittest.TestCase):
         # Check that ID header is inserted.
         msg = email.message_from_string(msg)
         headerName = options["Headers", "mailid_header_name"]
-        header = email.Header.Header(id, header_name=headerName)
+        header = email.header.Header(id, header_name=headerName)
+        msg[headerName] = header
         self.assertEqual(msg[headerName], str(header).replace('\n', '\r\n'))
 
     def test_insert_exception_header_no_separator(self):

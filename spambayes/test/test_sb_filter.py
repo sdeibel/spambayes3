@@ -24,16 +24,11 @@ good1 = email.message_from_string(good1)
 spam1 = email.message_from_string(spam1)
 
 TEMP_DBM_NAME = os.path.join(os.path.dirname(__file__), "temp.dbm")
-# The chances of anyone having a file with this name in the test
-# directory is minute, but we don't want to wipe anything, so make
-# sure that it doesn't already exist.  Our tearDown code gets rid
-# of our copy (whether the tests pass or fail) so it shouldn't
-# be ours.
+
+# In case teardown was never reached
 if os.path.exists(TEMP_DBM_NAME):
-    print((TEMP_DBM_NAME, "already exists.  Please remove this file " \
-          "before running these tests (a file by that name will be " \
-          "created and destroyed as part of the tests)."))
-    sys.exit(1)
+    print("Removing test data", TEMP_DBM_NAME)
+    os.unlink(TEMP_DBM_NAME)
 
 class HammieFilterTest(unittest.TestCase):
     def setUp(self):

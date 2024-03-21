@@ -4,7 +4,6 @@
 import sys
 import email
 import locale
-from types import UnicodeType
 
 import pspam.database
 from spambayes.tokenizer import tokenize
@@ -26,7 +25,7 @@ def main(fp):
     print("Clues")
     print("-----")
     for clue, prob in evidence:
-        if isinstance(clue, UnicodeType):
+        if isinstance(clue, str):
             clue = clue.encode(charset, 'replace')
         print((clue, prob))
 ##    print

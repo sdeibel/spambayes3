@@ -22,6 +22,8 @@ class _FactoryBaseTest(unittest.TestCase):
     # Subclass must define a concrete factory.
     factory = None
     def test_create_no_content(self):
+        if self.factory is None:
+            raise unittest.SkipTest('base class')
         f = self.factory()
         key = "testmessage"
         directory = "fctesthamcorpus"
@@ -31,6 +33,8 @@ class _FactoryBaseTest(unittest.TestCase):
         self.assertEqual(msg.loaded, False)
 
     def test_create_with_content(self):
+        if self.factory is None:
+            raise unittest.SkipTest('base class')
         f = self.factory()
         key = "testmessage"
         directory = "fctesthamcorpus"
@@ -39,7 +43,7 @@ class _FactoryBaseTest(unittest.TestCase):
         self.assertEqual(msg.file_name, key)
         self.assertEqual(msg.directory, directory)
         self.assertEqual(msg.loaded, True)
-        self.assertEqual(msg.as_string(), good1.replace("\n", "\r\n"))
+        self.assertEqual(msg.as_string(), good1)
 
 
 class FileMessageFactoryTest(_FactoryBaseTest):
@@ -59,7 +63,7 @@ class _FileCorpusBaseTest(unittest.TestCase):
         try:
             os.mkdir(dirname)
         except OSError as e:
-            if e[0] != errno.EEXIST:
+            if e.errno != errno.EEXIST:
                 raise
 
     def setUp(self):
@@ -107,6 +111,9 @@ class _FileMessageBaseTest(_FileCorpusBaseTest):
     wrong_klass = None
 
     def setUp(self):
+        if self.klass is None:
+            raise unittest.SkipTest('base class')
+        
         _FileCorpusBaseTest.setUp(self)
         self.filename = "testmessage"
         self.directory = "fctestspamcorpus"
@@ -147,7 +154,7 @@ class _FileMessageBaseTest(_FileCorpusBaseTest):
         self.assertEqual(self.msg.loaded, False)
 
     def test_as_string(self):
-        self.assertEqual(self.msg.as_string(), spam1.replace("\n", "\r\n"))
+        self.assertEqual(self.msg.as_string(), spam1)
 
     def test_pathname(self):
         self.assertEqual(self.msg.pathname(), os.path.join(self.directory,
@@ -182,7 +189,7 @@ class _FileMessageBaseTest(_FileCorpusBaseTest):
         self.assertEqual(self.msg.loaded, False)
         self.msg.load()
         self.assertEqual(self.msg.loaded, True)
-        self.assertEqual(self.msg.as_string(), spam1.replace("\n", "\r\n"))
+        self.assertEqual(self.msg.as_string(), spam1)
 
     def test_load_wrong(self):
         # Load incorrect type.
@@ -190,7 +197,7 @@ class _FileMessageBaseTest(_FileCorpusBaseTest):
         self.assertEqual(self.msg.loaded, False)
         self.msg.load()
         self.assertEqual(self.msg.loaded, True)
-        self.assertEqual(self.msg.as_string(), good1.replace("\n", "\r\n"))
+        self.assertEqual(self.msg.as_string(), good1)
 
     def test_load_already_loaded(self):
         # Shouldn't do anything if already loaded.
@@ -227,7 +234,7 @@ class GzipFileMessageTest(_FileMessageBaseTest):
         self.msg.store()
         pathname = os.path.join(self.directory, self.filename)
         f = gzip.open(pathname)
-        content = f.read()
+        content = f.read().decode('utf-8')
         f.close()
         self.assertEqual(content, good1)
 
@@ -275,7 +282,7 @@ class FileCorpusTest(_FileCorpusBaseTest):
         content = spam1
         msg = self.corpus.makeMessage(key, content)
         self.assertEqual(msg.key(), key)
-        self.assertEqual(msg.as_string(), content.replace("\n", "\r\n"))
+        self.assertEqual(msg.as_string(), content)
 
     def test_addMessage_invalid(self):
         class msg(object):

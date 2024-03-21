@@ -1,5 +1,11 @@
 # Spambayes3 - Python 3 version of spambayes
 
+Fork of an attempt to port spambayes to Python3.  I'm focused only on
+the smallish part that I use and have disabled unit tests for other
+things.
+
+--
+
 An attempt to port the sadly neglected spambayes spam analysis
 software to Python 3.  The migration was based on spambasyes-1.1a6, the
 latest version available (as far as I can tell).

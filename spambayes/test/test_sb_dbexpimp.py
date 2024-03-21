@@ -11,7 +11,7 @@ from spambayes.storage import PickledClassifier, DBDictClassifier
 import sb_test_support
 sb_test_support.fix_sys_path()
 
-import sb_dbexpimp
+from scripts import sb_dbexpimp
 
 # We borrow the test messages that test_sb_server uses.
 # I doubt it really makes much difference, but if we wanted more than
@@ -23,17 +23,12 @@ from test_sb_server import good1, spam1
 TEMP_PICKLE_NAME = os.path.join(os.path.dirname(__file__), "temp.pik")
 TEMP_CSV_NAME = os.path.join(os.path.dirname(__file__), "temp.csv")
 TEMP_DBM_NAME = os.path.join(os.path.dirname(__file__), "temp.dbm")
-# The chances of anyone having files with these names in the test
-# directory is minute, but we don't want to wipe anything, so make
-# sure that they don't already exist.  Our tearDown code gets rid
-# of our copies (whether the tests pass or fail) so they shouldn't
-# be ours.
+
+# In case teardown was never reached
 for fn in [TEMP_PICKLE_NAME, TEMP_CSV_NAME, TEMP_DBM_NAME]:
     if os.path.exists(fn):
-        print((fn, "already exists.  Please remove this file before " \
-              "running these tests (a file by that name will be " \
-              "created and destroyed as part of the tests)."))
-        sys.exit(1)
+        print("Removing test data", fn)
+        os.unlink(fn)
 
 class dbexpimpTest(unittest.TestCase):
     def tearDown(self):
@@ -66,7 +61,7 @@ class dbexpimpTest(unittest.TestCase):
         sb_dbexpimp.runExport(TEMP_PICKLE_NAME, "pickle", TEMP_CSV_NAME)
         # Verify that the CSV holds all the original data (and, by using
         # the CSV module to open it, that it is valid CSV data).
-        fp = open(TEMP_CSV_NAME, "rb")
+        fp = open(TEMP_CSV_NAME, "r")
         reader = sb_dbexpimp.csv.reader(fp)
         (nham, nspam) = next(reader)
         self.assertEqual(int(nham), bayes.nham)
@@ -93,7 +88,7 @@ class dbexpimpTest(unittest.TestCase):
         bayes = open_storage(TEMP_DBM_NAME, "dbm")
         # Verify that the CSV holds all the original data (and, by using
         # the CSV module to open it, that it is valid CSV data).
-        fp = open(TEMP_CSV_NAME, "rb")
+        fp = open(TEMP_CSV_NAME, "r")
         reader = sb_dbexpimp.csv.reader(fp)
         (nham, nspam) = next(reader)
         self.assertEqual(int(nham), bayes.nham)
@@ -107,7 +102,7 @@ class dbexpimpTest(unittest.TestCase):
 
     def test_import_to_pickle(self):
         # Create a CSV file to import.
-        temp = open(TEMP_CSV_NAME, "wb")
+        temp = open(TEMP_CSV_NAME, "w")
         temp.write("3,4\n")
         csv_data = {"this":(2,1), "is":(0,1), "a":(3,4), 'test':(1,1),
                     "of":(1,0), "the":(1,2), "import":(3,1)}
@@ -130,7 +125,7 @@ class dbexpimpTest(unittest.TestCase):
 
     def test_import_to_dbm(self):
         # Create a CSV file to import.
-        temp = open(TEMP_CSV_NAME, "wb")
+        temp = open(TEMP_CSV_NAME, "w")
         temp.write("3,4\n")
         csv_data = {"this":(2,1), "is":(0,1), "a":(3,4), 'test':(1,1),
                     "of":(1,0), "the":(1,2), "import":(3,1)}
@@ -160,7 +155,7 @@ class dbexpimpTest(unittest.TestCase):
         bayes.store()
         # Create a CSV file to import.
         nham, nspam = 3,4
-        temp = open(TEMP_CSV_NAME, "wb")
+        temp = open(TEMP_CSV_NAME, "w")
         temp.write("%d,%d\n" % (nham, nspam))
         csv_data = {"this":(2,1), "is":(0,1), "a":(3,4), 'test':(1,1),
                     "of":(1,0), "the":(1,2), "import":(3,1)}
@@ -206,7 +201,7 @@ class dbexpimpTest(unittest.TestCase):
         bayes.close()
         # Create a CSV file to import.
         nham, nspam = 3,4
-        temp = open(TEMP_CSV_NAME, "wb")
+        temp = open(TEMP_CSV_NAME, "w")
         temp.write("%d,%d\n" % (nham, nspam))
         csv_data = {"this":(2,1), "is":(0,1), "a":(3,4), 'test':(1,1),
                     "of":(1,0), "the":(1,2), "import":(3,1)}

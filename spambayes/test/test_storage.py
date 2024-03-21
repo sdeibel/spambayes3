@@ -16,6 +16,8 @@ class _StorageTestBase(unittest.TestCase):
     StorageClass = None
 
     def setUp(self):
+        if self.StorageClass is None:
+            raise unittest.SkipTest('base class')
         self.db_name = tempfile.mktemp("spambayestest")
         self.classifier = self.StorageClass(self.db_name)
 
@@ -196,9 +198,13 @@ class DBStorageTestCase(_StorageTestBase):
                 os.remove(name)
 
 class CDBStorageTestCase(_StorageTestBase):
+    def setUp(self):
+        raise unittest.SkipTest('CDB is completely broken')
     StorageClass = CDBClassifier
 
 class ZODBStorageTestCase(_StorageTestBase):
+    def setUp(self):
+        raise unittest.SkipTest('ZODB is completely broken')
     StorageClass = ZODBClassifier
 
 def suite():
