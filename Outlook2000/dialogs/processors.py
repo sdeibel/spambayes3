@@ -7,7 +7,7 @@
 import win32gui, win32api, win32con
 import commctrl
 import struct, array
-from dlgutils import *
+from .dlgutils import *
 
 # Cache our leaky bitmap handles
 bitmap_handles = {}
@@ -43,7 +43,7 @@ class ControlProcessor:
     def GetMessages(self):
         return []
     def OnMessage(self, msg, wparam, lparam):
-        raise RuntimeError, "I don't hook any messages, so I shouldn't be called"
+        raise RuntimeError("I don't hook any messages, so I shouldn't be called")
     def OnOptionChanged(self, option):
         pass
     def OnRButtonUp(self, wparam, lparam):
@@ -54,10 +54,10 @@ class ImageProcessor(ControlProcessor):
         rcp = self.window.manager.dialog_parser;
         bmp_id = int(win32gui.GetWindowText(self.GetControl()))
 
-        if bitmap_handles.has_key(bmp_id):
+        if bmp_id in bitmap_handles:
             handle = bitmap_handles[bmp_id]
         else:
-            import resources
+            from . import resources
             mod_handle, mod_bmp, extra_flags = resources.GetImageParamsFromBitmapID(rcp, bmp_id)
             load_flags = extra_flags|win32con.LR_COLOR|win32con.LR_SHARED
             handle = win32gui.LoadImage(mod_handle, mod_bmp,

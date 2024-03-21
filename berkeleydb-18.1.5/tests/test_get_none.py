@@ -86,7 +86,7 @@ class GetReturnsNoneTestCase(unittest.TestCase):
             rec = c.first()
             while rec:
                 count = count + 1
-                rec = c.next()
+                rec = next(c)
 
             self.assertEqual(rec, None)
             self.assertEqual(count, len(printable_bytes))
@@ -120,7 +120,7 @@ class GetReturnsNoneTestCase(unittest.TestCase):
             while rec:
                 count = count + 1
                 try:
-                    rec = c.next()
+                    rec = next(c)
                 except db.DBNotFoundError:  # end of the records
                     exceptionHappened = 1
                     break

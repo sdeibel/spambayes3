@@ -9,7 +9,7 @@ import win32gui, win32api, win32con
 import commctrl
 import struct, array
 
-from dlgutils import *
+from .dlgutils import *
 
 # Isolate the nasty stuff for tooltips somewhere.
 class TooltipManager:
@@ -203,9 +203,9 @@ class ProcessorDialog(TooltipDialog):
 
     def GetMessageMap(self):
         ret = TooltipDialog.GetMessageMap(self)
-        for key in self.processor_message_map.keys():
+        for key in list(self.processor_message_map.keys()):
             if key in ret:
-                print "*** WARNING: Overwriting message!!!"
+                print("*** WARNING: Overwriting message!!!")
             ret[key] = self.OnCommandProcessorMessage
         return ret
 
@@ -216,8 +216,8 @@ class ProcessorDialog(TooltipDialog):
                 try:
                     self.GetDlgItem(int_id)
                 except win32gui.error:
-                    print "ERROR: Dialog item %s refers to an invalid control" % \
-                          self._GetIDName(int_id)
+                    print(("ERROR: Dialog item %s refers to an invalid control" % \
+                          self._GetIDName(int_id)))
         self.LoadAllControls()
 
     def GetPopupHelpText(self, iCtrlId):
@@ -226,10 +226,10 @@ class ProcessorDialog(TooltipDialog):
         if cp is not None:
             return cp.GetPopupHelpText(iCtrlId)
 
-        print "Can not get command processor for", self._GetIDName(iCtrlId)
+        print(("Can not get command processor for", self._GetIDName(iCtrlId)))
         return None
     def OnRButtonUp(self, hwnd, msg, wparam, lparam):
-        for cp in self.command_processors.values():
+        for cp in list(self.command_processors.values()):
             cp.OnRButtonUp(wparam,lparam)
 
     def OnCommandProcessorMessage(self, hwnd, msg, wparam, lparam):
@@ -260,7 +260,7 @@ class ProcessorDialog(TooltipDialog):
     def ApplyHandlingOptionValueError(self, func, *args):
         try:
             return func(*args)
-        except ValueError, why:
+        except ValueError as why:
             mb_flags = win32con.MB_ICONEXCLAMATION | win32con.MB_OK
             win32gui.MessageBox(self.hwnd, str(why), "SpamBayes", mb_flags)
             return False
@@ -290,7 +290,7 @@ class ProcessorDialog(TooltipDialog):
         # delegate rest to our commands.
         handler = self.command_processors.get(idFrom)
         if handler is None:
-            print "Ignoring OnNotify for", self._GetIDName(idFrom)
+            print(("Ignoring OnNotify for", self._GetIDName(idFrom)))
             return
         return handler.OnNotify( (hwndFrom, idFrom, code), wparam, lparam)
 
@@ -299,12 +299,12 @@ class ProcessorDialog(TooltipDialog):
         id = win32api.LOWORD(wparam)
         # Sometimes called after OnDestroy???
         if self.command_processors is None:
-            print "Ignoring OnCommand for", self._GetIDName(id)
+            print(("Ignoring OnCommand for", self._GetIDName(id)))
             return
         else:
             handler = self.command_processors.get(id)
             if handler is None:
-                print "Ignoring OnCommand for", self._GetIDName(id)
+                print(("Ignoring OnCommand for", self._GetIDName(id)))
                 return
 
         self.ApplyHandlingOptionValueError(handler.OnCommand, wparam, lparam)

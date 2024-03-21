@@ -504,18 +504,18 @@ class DBEnv_logcursor(DBEnv):
     def test_3_next(self) :
         logc = self.env.log_cursor()
         lsn_last = logc.last()[0]
-        self.assertEqual(logc.next(), None)
+        self.assertEqual(next(logc), None)
         lsn_first = logc.first()[0]
-        v = logc.next()
+        v = next(logc)
         self._check_return(v)
         self.assertTrue(lsn_first < v[0])
         self.assertTrue(lsn_last > v[0])
 
-        v2 = logc.next()
+        v2 = next(logc)
         self.assertTrue(v2[0] > v[0])
         self.assertTrue(lsn_last > v2[0])
 
-        v3 = logc.next()
+        v3 = next(logc)
         self.assertTrue(v3[0] > v2[0])
         self.assertTrue(lsn_last > v3[0])
 
@@ -540,27 +540,27 @@ class DBEnv_logcursor(DBEnv):
     def test_5_current(self) :
         logc = self.env.log_cursor()
         logc.first()
-        v = logc.next()
+        v = next(logc)
         self.assertEqual(v, logc.current())
 
     def test_6_set(self) :
         logc = self.env.log_cursor()
         logc.first()
-        v = logc.next()
-        self.assertNotEqual(v, logc.next())
-        self.assertNotEqual(v, logc.next())
+        v = next(logc)
+        self.assertNotEqual(v, next(logc))
+        self.assertNotEqual(v, next(logc))
         self.assertEqual(v, logc.set(v[0]))
 
     def test_explicit_close(self) :
         logc = self.env.log_cursor()
         logc.close()
-        self.assertRaises(db.DBCursorClosedError, logc.next)
+        self.assertRaises(db.DBCursorClosedError, logc.__next__)
 
     def test_implicit_close(self) :
         logc =  [self.env.log_cursor() for i in range(10)]
         self.env.close()  # This close should close too all its tree
         for i in logc :
-            self.assertRaises(db.DBCursorClosedError, i.next)
+            self.assertRaises(db.DBCursorClosedError, i.__next__)
 
 class DBEnv_lsn(DBEnv):
     def setUp(self):

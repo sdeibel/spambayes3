@@ -8,7 +8,7 @@ Converts an .rc windows resource source file into a python source file
 with the same basic public interface as the rcparser module.
 """
 import sys, os, stat
-import rcparser
+from . import rcparser
 
 def convert(inputFilename = None, outputFilename = None,
             enableGettext = True):

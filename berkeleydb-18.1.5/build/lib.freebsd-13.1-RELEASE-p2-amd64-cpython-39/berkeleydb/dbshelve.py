@@ -158,7 +158,7 @@ class DBShelf(MutableMapping):
         if self._closed:
             return '<DBShelf @ 0x%x - closed>' % (id(self))
         else:
-            return repr(dict(iter(self.items())))
+            return repr(dict(iter(list(self.items()))))
 
 
     def items(self, txn=None):

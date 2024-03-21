@@ -117,7 +117,7 @@ class RCParser:
 
     def debug(self, *args):
         if self.debugEnabled:
-            print args
+            print(args)
 
     def getToken(self):
         self.token = self.lex.get_token()
@@ -152,7 +152,7 @@ class RCParser:
             self.parseH(h)
             h.close()
         except IOError:
-            print "No .h file. ignoring."
+            print("No .h file. ignoring.")
         f = open(rcFileName)
         self.open(f)
         self.getToken()
@@ -177,10 +177,10 @@ class RCParser:
                     n = lex.get_token()
                     i = int(lex.get_token())
                     self.ids[n] = i
-                    if self.names.has_key(i):
+                    if i in self.names:
                         # ignore AppStudio special ones.
                         if not n.startswith("_APS_"):
-                            print "Duplicate id",i,"for",n,"is", self.names[i]
+                            print("Duplicate id",i,"for",n,"is", self.names[i])
                     else:
                         self.names[i] = n
                     if self.next_id<=i:
@@ -214,7 +214,7 @@ class RCParser:
                     self.getToken() # bmpname
                 bmf = self.token[1:-1] # quotes
                 self.bitmaps[possibleBitmap] = bmf
-                print "BITMAP", possibleBitmap, bmf
+                print("BITMAP", possibleBitmap, bmf)
                 #print win32gui.LoadImage(0, bmf, win32con.IMAGE_BITMAP,0,0,win32con.LR_DEFAULTCOLOR|win32con.LR_LOADFROMFILE)
 
     def addId(self, id_name):
@@ -351,8 +351,7 @@ class RCParser:
             # msvc seems to occasionally replace "IDC_STATIC" with -1
             if self.token=='-':
                 if self.getToken() != '1':
-                    raise RuntimeError, \
-                          "Negative literal in rc script (other than -1) - don't know what to do"
+                    raise RuntimeError("Negative literal in rc script (other than -1) - don't know what to do")
                 self.token = "IDC_STATIC"
             control.id = self.token
             control.idNum = self.addId(control.id)
@@ -389,11 +388,11 @@ def ParseDialogs(rc_file, gettexted=False):
     except:
         lex = getattr(rcp, "lex", None)
         if lex:
-            print "ERROR parsing dialogs at line", lex.lineno
-            print "Next 10 tokens are:"
+            print("ERROR parsing dialogs at line", lex.lineno)
+            print("Next 10 tokens are:")
             for i in range(10):
-                print lex.get_token(),
-            print
+                print(lex.get_token(), end=' ')
+            print()
         raise
 
     return rcp
@@ -402,7 +401,7 @@ if __name__=='__main__':
     rc_file = os.path.join(os.path.dirname(__file__), "dialogs.rc")
     d = ParseDialogs(rc_file)
     import pprint
-    for id, ddef in d.dialogs.items():
-        print "Dialog %s (%d controls)" % (id, len(ddef))
+    for id, ddef in list(d.dialogs.items()):
+        print("Dialog %s (%d controls)" % (id, len(ddef)))
         pprint.pprint(ddef)
-        print
+        print()

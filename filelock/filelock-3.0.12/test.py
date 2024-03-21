@@ -64,7 +64,7 @@ class ExThread(threading.Thread):
                 raise self.ex[0].with_traceback(self.ex[1], self.ex[2])
             elif PY2:
                 wrapper_ex = self.ex[1]
-                raise (wrapper_ex.__class__, wrapper_ex, self.ex[2])
+                raise wrapper_ex.__class__
         return None
 
 

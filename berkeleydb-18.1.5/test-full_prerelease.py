@@ -63,16 +63,16 @@ def do_matrix_check() :
   for py in python_versions :
     for bdb in berkeleydb_versions :
       print()
-      print("*** Testing bindings for Python %s and Berkeley DB %s" %(py,bdb))
+      print(("*** Testing bindings for Python %s and Berkeley DB %s" %(py,bdb)))
       extra_params = [warning_level, '-tt', '-bb']
       params = extra_params + ["setup.py", "-q", \
                  "--berkeley-db=/usr/local/BerkeleyDB."+bdb,"build", "-f"]
       params = ["/usr/local/bin/python"+py] + params
-      print("EXECUTING:", " ".join(params))
+      print(("EXECUTING:", " ".join(params)))
       ret=subprocess.call(params)
       if not ret :
         params = ["/usr/local/bin/python"+py] + extra_params + ["test.py","-p"]
-        print("EXECUTING:", " ".join(params))
+        print(("EXECUTING:", " ".join(params)))
         ret = subprocess.call(params)
       if ret :
         print()

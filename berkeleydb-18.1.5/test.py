@@ -176,7 +176,7 @@ class ImmediateTestResult(TextTestResult):
         #print time.time()-self._time
         if gc.garbage:
             print(test)
-            print(gc.garbage)
+            print((gc.garbage))
 
     def _print_traceback(self, msg, err, test, errlist):
         if self.showAll or self.dots:
@@ -289,11 +289,11 @@ def get_suite(file):
     except RuntimeError:
         # test uses some optional software
         if VERBOSE:
-            print('Module with missing optional software skipped:', modname)
+            print(('Module with missing optional software skipped:', modname))
         return None
     except ImportError as err:
         # print traceback
-        print("Error importing %s\n%s" % (modname, err))
+        print(("Error importing %s\n%s" % (modname, err)))
         print_tb_last()
         print()
         if debug:
@@ -302,7 +302,7 @@ def get_suite(file):
     try:
         suite_func = mod.test_suite
     except AttributeError:
-        print("No test_suite() in %s" % modname)
+        print(("No test_suite() in %s" % modname))
         return None
     return suite_func()
 
@@ -432,7 +432,7 @@ def process_args(argv=None):
                                    ['help'])
     except getopt.error as msg:
         print(msg)
-        print("Try `python %s -h' for more information." % argv[0])
+        print(("Try `python %s -h' for more information." % argv[0]))
         sys.exit(2)
 
     for k, v in opts:
@@ -450,11 +450,11 @@ def process_args(argv=None):
             gcthresh = int(v)
         elif k == '-G':
             if not v.startswith("DEBUG_"):
-                print("-G argument must be DEBUG_ flag, not", repr(v))
+                print(("-G argument must be DEBUG_ flag, not", repr(v)))
                 sys.exit(1)
             gcflags.append(v)
         elif k in ('-h', '--help'):
-            print(__doc__ % globals())
+            print((__doc__ % globals()))
             sys.exit(0)
         elif k == '-L':
             LOOP = True
@@ -471,7 +471,7 @@ def process_args(argv=None):
 
     if gcthresh is not None:
         gc.set_threshold(gcthresh)
-        print('gc threshold:', gc.get_threshold())
+        print(('gc threshold:', gc.get_threshold()))
 
     if gcflags:
         import gc
@@ -479,8 +479,8 @@ def process_args(argv=None):
         for flag in gcflags:
             v = getattr(gc, flag, None)
             if v is None:
-                print("Unknown gc flag", repr(flag))
-                print(gc.set_debug.__doc__)
+                print(("Unknown gc flag", repr(flag)))
+                print((gc.set_debug.__doc__))
                 sys.exit(1)
             val |= v
         gc.set_debug(v)
@@ -490,7 +490,7 @@ def process_args(argv=None):
         cmd = sys.executable + ' setup.py build'
         sts = os.system(cmd)
         if sts:
-            print("Build failed", hex(sts))
+            print(("Build failed", hex(sts)))
             sys.exit(1)
 
     if args:
@@ -503,7 +503,7 @@ def process_args(argv=None):
             sys.exit(1)
     except ImportError as err:
         print(err)
-        print(sys.path)
+        print((sys.path))
         raise
 
 

@@ -94,19 +94,19 @@ class DBEnvClosedEarlyCrash(unittest.TestCase):
         self.assertEqual(d.get(b'test'), b'this is a test', 'put!=get')
         c=d.cursor()
         c.first()
-        c.next()
+        next(c)
         d.close()  # This "close" should close the child db handle also
      # db.close should close the child cursor
-        self.assertRaises(db.DBError,c.next)
+        self.assertRaises(db.DBError,c.__next__)
 
         d = db.DB(dbenv)
         d.open(self.filename, db.DB_BTREE, db.DB_CREATE | db.DB_THREAD, 0o666)
         c=d.cursor()
         c.first()
-        c.next()
+        next(c)
         dbenv.close()
     # The "close" should close the child db handle also, with cursors
-        self.assertRaises(db.DBError, c.next)
+        self.assertRaises(db.DBError, c.__next__)
 
     def test03_close_db_before_dbcursor_without_env(self):
         path=os.path.join(self.homeDir,self.filename)
@@ -119,10 +119,10 @@ class DBEnvClosedEarlyCrash(unittest.TestCase):
         self.assertEqual(d.get(b'test'), b'this is a test', 'put!=get')
         c=d.cursor()
         c.first()
-        c.next()
+        next(c)
         d.close()
     # The "close" should close the child db handle also
-        self.assertRaises(db.DBError, c.next)
+        self.assertRaises(db.DBError, c.__next__)
 
     def test04_close_massive(self):
         dbenv = db.DBEnv()
@@ -155,10 +155,10 @@ class DBEnvClosedEarlyCrash(unittest.TestCase):
         self.assertRaises(db.DBError, cursors[101].first)
 
         cursors[80].first()
-        cursors[80].next()
+        next(cursors[80])
         dbenv.close()  # This "close" should close the child db handle also
     # Check for missing exception! (after DBEnv close)
-        self.assertRaises(db.DBError, cursors[80].next)
+        self.assertRaises(db.DBError, cursors[80].__next__)
 
     def test05_close_dbenv_delete_db_success(self):
         dbenv = db.DBEnv()

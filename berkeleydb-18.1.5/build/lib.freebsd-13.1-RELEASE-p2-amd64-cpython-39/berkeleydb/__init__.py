@@ -89,7 +89,7 @@ class _iter_mixin(MutableMapping):
 
                 while True:
                     try:
-                        key = _DeadlockWrap(cur.next, 0, 0, 0)[0]
+                        key = _DeadlockWrap(cur.__next__, 0, 0, 0)[0]
                         yield key
                     except _db.DBCursorClosedError:
                         if self._kill_iteration:
@@ -128,7 +128,7 @@ class _iter_mixin(MutableMapping):
 
                 while True:
                     try:
-                        kv = _DeadlockWrap(cur.next)
+                        kv = _DeadlockWrap(cur.__next__)
                         key = kv[0]
                         yield kv
                     except _db.DBCursorClosedError:
@@ -270,14 +270,14 @@ class _DBWithCursor(_iter_mixin):
         self._checkCursor()
         return _DeadlockWrap(self.dbc.set_range, key)
 
-    def next(self):
+    def __next__(self):
         self._checkOpen()
         self._checkCursor()
-        rv = _DeadlockWrap(self.dbc.next)
+        rv = _DeadlockWrap(self.dbc.__next__)
         return rv
 
     def __next__(self):
-        return self.next()
+        return next(self)
 
     def previous(self):
         self._checkOpen()

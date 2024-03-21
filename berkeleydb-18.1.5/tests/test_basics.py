@@ -59,10 +59,10 @@ class VersionTestCase(unittest.TestCase):
     def test00_version(self):
         info = db.version()
         if verbose:
-            print('\n', '-=' * 20)
-            print('berkeleydb.db.version(): %s' % (info, ))
-            print(db.DB_VERSION_STRING)
-            print('-=' * 20)
+            print(('\n', '-=' * 20))
+            print(('berkeleydb.db.version(): %s' % (info, )))
+            print((db.DB_VERSION_STRING))
+            print(('-=' * 20))
         self.assertEqual(info, (db.DB_VERSION_MAJOR, db.DB_VERSION_MINOR,
                         db.DB_VERSION_PATCH))
 
@@ -158,7 +158,7 @@ class BasicTestCase(unittest.TestCase):
 
         num = len(d)
         if verbose:
-            print("created %d records" % num)
+            print(("created %d records" % num))
 
 
     def makeData(self, key):
@@ -172,8 +172,8 @@ class BasicTestCase(unittest.TestCase):
         d = self.d
 
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test01_GetsAndPuts..." % self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test01_GetsAndPuts..." % self.__class__.__name__))
 
         for key in [b'0001', b'0100', b'0400', b'0700', b'0999']:
             data = d.get(key)
@@ -264,9 +264,9 @@ class BasicTestCase(unittest.TestCase):
         d = self.d
 
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test02_DictionaryMethods..." % \
-                  self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test02_DictionaryMethods..." % \
+                  self.__class__.__name__))
 
         for key in [b'0002', b'0101', b'0401', b'0701', b'0998']:
             data = d[key]
@@ -339,9 +339,9 @@ class BasicTestCase(unittest.TestCase):
 
     def test03_SimpleCursorStuff(self, get_raises_error=0, set_raises_error=0):
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test03_SimpleCursorStuff (get_error %s, set_error %s)..." % \
-                  (self.__class__.__name__, get_raises_error, set_raises_error))
+            print(('\n', '-=' * 30))
+            print(("Running %s.test03_SimpleCursorStuff (get_error %s, set_error %s)..." % \
+                  (self.__class__.__name__, get_raises_error, set_raises_error)))
 
         if self.env and self.dbopenflags & db.DB_AUTO_COMMIT:
             txn = self.env.txn_begin()
@@ -356,7 +356,7 @@ class BasicTestCase(unittest.TestCase):
             if verbose and count % 100 == 0:
                 print(rec)
             try:
-                rec = c.next()
+                rec = next(c)
             except db.DBNotFoundError as val:
                 if get_raises_error:
                     self.assertEqual(val.args[0], db.DB_NOTFOUND)
@@ -428,16 +428,16 @@ class BasicTestCase(unittest.TestCase):
         if self.d.get_type() == db.DB_BTREE:
             rec = c.set_range(b'011')
             if verbose:
-                print("searched for b'011', found: ", rec)
+                print(("searched for b'011', found: ", rec))
 
             rec = c.set_range(b'011', dlen=0, doff=0)
             if verbose:
-                print("searched (partial) for b'011', found: ", rec)
+                print(("searched (partial) for b'011', found: ", rec))
             if rec[1] != b'': self.fail('expected empty data portion')
 
             ev = c.set_range(b'empty value')
             if verbose:
-                print("search for b'empty value' returned", ev)
+                print(("search for b'empty value' returned", ev))
             if ev[1] != b'': self.fail('empty value lookup failed')
 
         c.set(b'0499')
@@ -454,7 +454,7 @@ class BasicTestCase(unittest.TestCase):
             if get_raises_error:
                 self.fail('DBKeyEmptyError exception expected')
 
-        c.next()
+        next(c)
         c2 = c.dup(db.DB_POSITION)
         self.assertEqual(c.current(), c2.current())
 
@@ -486,8 +486,8 @@ class BasicTestCase(unittest.TestCase):
         for method, args in list(methods_to_test.items()):
             try:
                 if verbose:
-                    print("attempting to use a closed cursor's %s method" % \
-                          method)
+                    print(("attempting to use a closed cursor's %s method" % \
+                          method))
                 # a bug may cause a NULL pointer dereference...
                 getattr(c, method)(*args)
             except db.DBError as val:
@@ -511,9 +511,9 @@ class BasicTestCase(unittest.TestCase):
     def test03b_SimpleCursorWithoutGetReturnsNone0(self):
         # same test but raise exceptions instead of returning None
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test03b_SimpleCursorStuffWithoutGetReturnsNone..." % \
-                  self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test03b_SimpleCursorStuffWithoutGetReturnsNone..." % \
+                  self.__class__.__name__))
 
         old = self.d.set_get_returns_none(0)
         self.assertEqual(old, 2)
@@ -522,9 +522,9 @@ class BasicTestCase(unittest.TestCase):
     def test03b_SimpleCursorWithGetReturnsNone1(self):
         # same test but raise exceptions instead of returning None
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test03b_SimpleCursorStuffWithoutGetReturnsNone..." % \
-                  self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test03b_SimpleCursorStuffWithoutGetReturnsNone..." % \
+                  self.__class__.__name__))
 
         old = self.d.set_get_returns_none(1)
         self.test03_SimpleCursorStuff(get_raises_error=0, set_raises_error=1)
@@ -533,9 +533,9 @@ class BasicTestCase(unittest.TestCase):
     def test03c_SimpleCursorGetReturnsNone2(self):
         # same test but raise exceptions instead of returning None
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test03c_SimpleCursorStuffWithoutSetReturnsNone..." % \
-                  self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test03c_SimpleCursorStuffWithoutSetReturnsNone..." % \
+                  self.__class__.__name__))
 
         old = self.d.set_get_returns_none(1)
         self.assertEqual(old, 2)
@@ -556,9 +556,9 @@ class BasicTestCase(unittest.TestCase):
     def test04_PartialGetAndPut(self):
         d = self.d
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test04_PartialGetAndPut..." % \
-                  self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test04_PartialGetAndPut..." % \
+                  self.__class__.__name__))
 
         key = b'partialTest'
         data = b'1' * 1000 + b'2' * 1000
@@ -587,8 +587,8 @@ class BasicTestCase(unittest.TestCase):
     def test05_GetSize(self):
         d = self.d
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test05_GetSize..." % self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test05_GetSize..." % self.__class__.__name__))
 
         for i in range(1, 50000, 500):
             key = b'size%d' % i
@@ -600,8 +600,8 @@ class BasicTestCase(unittest.TestCase):
     def test06_Truncate(self):
         d = self.d
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test06_Truncate..." % self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test06_Truncate..." % self.__class__.__name__))
 
         d.put(b'abcde', b'ABCDE');
         num = d.truncate()
@@ -813,8 +813,8 @@ class BasicWithEnvTestCase(BasicTestCase):
             return
 
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test09_EnvRemoveAndRename..." % self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test09_EnvRemoveAndRename..." % self.__class__.__name__))
 
         # can't rename or remove an open DB
         self.d.close()
@@ -828,8 +828,8 @@ class BasicWithEnvTestCase(BasicTestCase):
             return
 
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test09_EnvRemoveAndRename..." % self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test09_EnvRemoveAndRename..." % self.__class__.__name__))
 
         # can't rename or remove an open DB
         self.d.close()
@@ -874,8 +874,8 @@ class BasicTransactionTestCase(BasicTestCase):
     def test06_Transactions(self):
         d = self.d
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test06_Transactions..." % self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test06_Transactions..." % self.__class__.__name__))
 
         self.assertEqual(d.get(b'new rec', txn=self.txn), None)
         d.put(b'new rec', b'this is a new record', self.txn)
@@ -901,7 +901,7 @@ class BasicTransactionTestCase(BasicTestCase):
             count = count + 1
             if verbose and count % 100 == 0:
                 print(rec)
-            rec = c.next()
+            rec = next(c)
         self.assertEqual(count, self._numKeys+1)
 
         c.close()                # Cursors *MUST* be closed before commit!
@@ -922,7 +922,7 @@ class BasicTransactionTestCase(BasicTestCase):
         self.assertNotEqual(logs, None)
         for log in logs:
             if verbose:
-                print('log file: ' + log)
+                print(('log file: ' + log))
         logs = self.env.log_archive(db.DB_ARCH_REMOVE)
         self.assertTrue(not logs)
 
@@ -946,8 +946,8 @@ class BasicTransactionTestCase(BasicTestCase):
     def test09_TxnTruncate(self):
         d = self.d
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test09_TxnTruncate..." % self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test09_TxnTruncate..." % self.__class__.__name__))
 
         d.put(b'abcde', b'ABCDE');
         txn = self.env.txn_begin()
@@ -1098,21 +1098,21 @@ class BTreeRecnoTestCase(BasicTestCase):
     def test09_RecnoInBTree(self):
         d = self.d
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test09_RecnoInBTree..." % self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test09_RecnoInBTree..." % self.__class__.__name__))
 
         rec = d.get(200)
         self.assertEqual(type(rec), type(()))
         self.assertEqual(len(rec), 2)
         if verbose:
-            print("Record #200 is ", rec)
+            print(("Record #200 is ", rec))
 
         c = d.cursor()
         c.set(b'0200')
         num = c.get_recno()
         self.assertEqual(type(num), type(1))
         if verbose:
-            print("recno of d[b'0200'] is ", num)
+            print(("recno of d[b'0200'] is ", num))
 
         rec = c.current()
         self.assertEqual(c.set_recno(num), rec)
@@ -1132,9 +1132,9 @@ class BasicDUPTestCase(BasicTestCase):
     def test10_DuplicateKeys(self):
         d = self.d
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test10_DuplicateKeys..." % \
-                  self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test10_DuplicateKeys..." % \
+                  self.__class__.__name__))
 
         d.put(b'dup0', b'before')
         for x in b'The quick brown fox jumped over the lazy dog.'.split():
@@ -1150,7 +1150,7 @@ class BasicDUPTestCase(BasicTestCase):
         rec = c.set(b'dup1')
         self.assertEqual(rec, (b'dup1', b'The'))
 
-        next_reg = c.next()
+        next_reg = next(c)
         self.assertEqual(next_reg, (b'dup1', b'quick'))
 
         rec = c.set(b'dup1')
@@ -1205,8 +1205,8 @@ class BasicMultiDBTestCase(BasicTestCase):
     def test11_MultiDB(self):
         d1 = self.d
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test11_MultiDB..." % self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test11_MultiDB..." % self.__class__.__name__))
 
         d2 = db.DB(self.env)
         d2.open(self.filename, "second", self.dbtype,
@@ -1247,7 +1247,7 @@ class BasicMultiDBTestCase(BasicTestCase):
             count = count + 1
             if verbose and (count % 50) == 0:
                 print(rec)
-            rec = c1.next()
+            rec = next(c1)
         self.assertEqual(count, self._numKeys)
 
         count = 0
@@ -1256,7 +1256,7 @@ class BasicMultiDBTestCase(BasicTestCase):
             count = count + 1
             if verbose:
                 print(rec)
-            rec = c2.next()
+            rec = next(c2)
         self.assertEqual(count, 9)
 
         count = 0
@@ -1265,7 +1265,7 @@ class BasicMultiDBTestCase(BasicTestCase):
             count = count + 1
             if verbose:
                 print(rec)
-            rec = c3.next()
+            rec = next(c3)
         self.assertEqual(count, len(printable_bytes))
 
 

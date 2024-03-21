@@ -103,8 +103,8 @@ class DBShelveTestCase(unittest.TestCase):
 
     def test01_basics(self):
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test01_basics..." % self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test01_basics..." % self.__class__.__name__))
 
         self.populateDB(self.d)
         self.d.sync()
@@ -118,9 +118,9 @@ class DBShelveTestCase(unittest.TestCase):
         f = d.fd()
 
         if verbose:
-            print("length:", l)
-            print("keys:", k)
-            print("stats:", s)
+            print(("length:", l))
+            print(("keys:", k))
+            print(("stats:", s))
 
         self.assertEqual(0, self.mk(b'bad key') in d)
         self.assertEqual(1, self.mk(b'IA') in d)
@@ -137,7 +137,7 @@ class DBShelveTestCase(unittest.TestCase):
             value = d[key]
             values.append(value)
             if verbose:
-                print("%s: %s" % (key, value))
+                print(("%s: %s" % (key, value)))
             self.checkrec(key, value)
 
         dbvalues = list(d.values())
@@ -170,8 +170,8 @@ class DBShelveTestCase(unittest.TestCase):
 
     def test02_cursors(self):
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test02_cursors..." % self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test02_cursors..." % self.__class__.__name__))
 
         self.populateDB(self.d)
         d = self.d
@@ -185,7 +185,7 @@ class DBShelveTestCase(unittest.TestCase):
                 print(rec)
             key, value = rec
             self.checkrec(key, value)
-            rec = c.next()
+            rec = next(c)
         del c
 
         self.assertEqual(count, len(d))
@@ -212,8 +212,8 @@ class DBShelveTestCase(unittest.TestCase):
     def test03_append(self):
         # NOTE: this is overridden in RECNO subclass, don't change its name.
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test03_append..." % self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test03_append..." % self.__class__.__name__))
 
         self.assertRaises(dbshelve.DBShelveError,
                           self.d.append, 'unit test was here')
@@ -366,8 +366,8 @@ class RecNoShelveTestCase(BasicShelveTestCase):
 
     def test03_append(self):
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test03_append..." % self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test03_append..." % self.__class__.__name__))
 
         self.d[1] = b'spam'
         self.d[5] = b'eggs'

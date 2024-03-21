@@ -139,7 +139,7 @@ def CancelWizardConfig(manager, wc):
             try:
                 os.remove(fname)
             except OSError:
-                print "Warning: unable to remove", fname
+                print(("Warning: unable to remove", fname))
 
 def CreateWizardConfig(manager, from_existing):
     import config

@@ -134,7 +134,7 @@ class HeapTestCaseOpen(HeapTestCase):
         while rec:
             self.assertIn(rec, keys)
             keys.remove(rec)
-            rec = cursor.next()
+            rec = next(cursor)
         self.assertIsNone(rec)
         self.assertFalse(keys)  # Empty
 

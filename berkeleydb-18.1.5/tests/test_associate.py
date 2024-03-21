@@ -124,9 +124,9 @@ class AssociateErrorTestCase(unittest.TestCase):
 
     def test00_associateDBError(self):
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test00_associateDBError..." % \
-                  self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test00_associateDBError..." % \
+                  self.__class__.__name__))
 
         dupDB = db.DB(self.env)
         dupDB.set_flags(db.DB_DUP)
@@ -228,9 +228,9 @@ class AssociateTestCase(unittest.TestCase):
 
     def test01_associateWithDB(self):
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test01_associateWithDB..." % \
-                  self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test01_associateWithDB..." % \
+                  self.__class__.__name__))
 
         return self._associateWithDB(self.getGenre)
 
@@ -250,25 +250,25 @@ class AssociateTestCase(unittest.TestCase):
 
     def test02_associateAfterDB(self):
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test02_associateAfterDB..." % \
-                  self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test02_associateAfterDB..." % \
+                  self.__class__.__name__))
 
         return self._associateAfterDB(self.getGenre)
 
     def test03_associateWithDB(self):
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test03_associateWithDB..." % \
-                  self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test03_associateWithDB..." % \
+                  self.__class__.__name__))
 
         return self._associateWithDB(self.getGenreList)
 
     def test04_associateAfterDB(self):
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test04_associateAfterDB..." % \
-                  self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test04_associateAfterDB..." % \
+                  self.__class__.__name__))
 
         return self._associateAfterDB(self.getGenreList)
 
@@ -306,7 +306,7 @@ class AssociateTestCase(unittest.TestCase):
             count = count + 1
             if verbose:
                 print(rec)
-            rec = self.cur.next()
+            rec = next(self.cur)
         self.assertEqual(count, len(musicdata))  # all items accounted for
 
 
@@ -338,7 +338,7 @@ class AssociateTestCase(unittest.TestCase):
             count = count + 1
             if verbose:
                 print(rec)
-            rec = self.cur.next()
+            rec = next(self.cur)
         # all items accounted for EXCEPT for 1 with "Blues" genre
         self.assertEqual(count, len(musicdata)-1)
 
@@ -352,7 +352,7 @@ class AssociateTestCase(unittest.TestCase):
         genre = priData.split(b'|')[genre]
 
         if verbose:
-            print('getGenre key: %r data: %r' % (priKey, priData))
+            print(('getGenre key: %r data: %r' % (priKey, priData)))
 
         if genre == b'Blues':
             return db.DB_DONOTINDEX
@@ -403,9 +403,9 @@ class AssociateBTreeTxnTestCase(AssociateBTreeTestCase):
 
     def test13_associate_in_transaction(self):
         if verbose:
-            print('\n', '-=' * 30)
-            print("Running %s.test13_associateAutoCommit..." % \
-                  self.__class__.__name__)
+            print(('\n', '-=' * 30))
+            print(("Running %s.test13_associateAutoCommit..." % \
+                  self.__class__.__name__))
 
         txn = self.env.txn_begin()
         try:
@@ -446,7 +446,7 @@ class ShelveAssociateTestCase(AssociateTestCase):
     def getGenre(self, priKey, priData):
         self.assertEqual(type(priData), type(()))
         if verbose:
-            print('getGenre key: %r data: %r' % (priKey, priData))
+            print(('getGenre key: %r data: %r' % (priKey, priData)))
         genre = priData[2]
         if genre == b'Blues':
             return db.DB_DONOTINDEX

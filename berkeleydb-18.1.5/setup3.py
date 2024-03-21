@@ -173,7 +173,7 @@ if os.name == 'posix':
             # search path.
             for d in inc_dirs + db_inc_paths:
                 f = os.path.join(d, "db.h")
-                if debug: print("db: looking for db.h in", f)
+                if debug: print(("db: looking for db.h in", f))
                 if os.path.exists(f):
                     with open(f) as fichero :
                         f = fichero.read()
@@ -189,13 +189,13 @@ if os.name == 'posix':
                             # save the include directory with the db.h version
                             # (first occurrance only)
                             db_ver_inc_map[db_ver] = d
-                            if debug: print("db.h: found", db_ver, "in", d)
+                            if debug: print(("db.h: found", db_ver, "in", d))
                         else:
                             # we already found a header for this library version
-                            if debug: print("db.h: ignoring", d)
+                            if debug: print(("db.h: ignoring", d))
                     else:
                         # ignore this header, it didn't contain a version number
-                        if debug: print("db.h: unsupported version", db_ver, "in", d)
+                        if debug: print(("db.h: unsupported version", db_ver, "in", d))
 
             db_found_vers = list(db_ver_inc_map.keys())
             db_found_vers.sort()
@@ -228,13 +228,13 @@ if os.name == 'posix':
                         db_libdir = os.path.abspath(os.path.dirname(dblib_file))
                         raise db_found
                     else:
-                        if debug: print("db lib: ", dblib, "not found")
+                        if debug: print(("db lib: ", dblib, "not found"))
         except db_found:
-            print("Found Oracle Berkeley DB %d.%d installation." % db_ver)
-            print("  include files in", db_incdir)
-            print("  library files in", db_libdir)
-            print("  library name is lib"+dblib)
-            if debug: print("db: lib dir", db_libdir, "inc dir", db_incdir)
+            print(("Found Oracle Berkeley DB %d.%d installation." % db_ver))
+            print(("  include files in", db_incdir))
+            print(("  library files in", db_libdir))
+            print(("  library name is lib"+dblib))
+            if debug: print(("db: lib dir", db_libdir, "inc dir", db_incdir))
 
             incdir  = db_incdir
             libdir  = db_libdir
@@ -259,7 +259,7 @@ if os.name == 'posix':
     if not '-ldb' in LIBS:
         libname = [dblib]
     else:
-        if debug: print("LIBS already contains '-ldb' not adding our own", "'-l"+dblib+"'")
+        if debug: print(("LIBS already contains '-ldb' not adding our own", "'-l"+dblib+"'"))
         libname = []
     utils = []
 
@@ -290,7 +290,7 @@ if os.name == 'posix':
 \tPython either with bsddb disabled, or with it built as a shared
 \tdynamic extension. Watch out for other modules (e.g. dbm) that create
 \tdependencies in the python executable to libdb as a side effect.""")
-        st = input("Build anyway? (yes/[no]) ")
+        st = eval(input("Build anyway? (yes/[no]) "))
         if st != "yes":
             sys.exit(1)
 
@@ -317,7 +317,7 @@ if os.name == 'posix':
         raise AssertionError(
                 'berkeleydb module untested with this Oracle Berkeley DB '
                 'version %d.%d' %db_ver)
-    print('Detected Oracle Berkeley DB version %d.%d from db.h' %db_ver)
+    print(('Detected Oracle Berkeley DB version %d.%d from db.h' %db_ver))
 
 elif os.name == 'nt':
 
@@ -358,7 +358,7 @@ elif os.name == 'nt':
         raise AssertionError(
                 'berkeleydb untested with this Oracle Berkeley DB '
                 'version %d.%d' %db_ver)
-    print('Detected Oracle Berkeley DB version %d.%d from db.h' %db_ver)
+    print(('Detected Oracle Berkeley DB version %d.%d from db.h' %db_ver))
 
     if debug:
         libname = ['libdb%ssd' % ver]     # Debug, static

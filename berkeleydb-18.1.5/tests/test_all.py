@@ -70,24 +70,24 @@ if 'silent' in sys.argv:  # take care of old flag, just in case
 
 def print_versions():
     print()
-    print('-=' * 38)
-    print(db.DB_VERSION_STRING)
-    print('berkeleydb.db.version():   %s' % (db.version(), ))
+    print(('-=' * 38))
+    print((db.DB_VERSION_STRING))
+    print(('berkeleydb.db.version():   %s' % (db.version(), )))
     if db.version() >= (5, 3) :
-        print('berkeleydb.db.full_version(): %s' %repr(db.full_version()))
-    print('berkeleydb.db.__version__: %s' % db.__version__)
+        print(('berkeleydb.db.full_version(): %s' %repr(db.full_version())))
+    print(('berkeleydb.db.__version__: %s' % db.__version__))
 
     # Workaround for allowing generating an EGGs as a ZIP files.
     suffix="__"
-    print('py module:            %s' % getattr(berkeleydb, "__file"+suffix))
-    print('extension module:     %s' % getattr(berkeleydb, "__file"+suffix))
+    print(('py module:            %s' % getattr(berkeleydb, "__file"+suffix)))
+    print(('extension module:     %s' % getattr(berkeleydb, "__file"+suffix)))
 
-    print('Test working dir:     %s' % get_test_path_prefix())
-    print('python version:       %s %s' % \
+    print(('Test working dir:     %s' % get_test_path_prefix()))
+    print(('python version:       %s %s' % \
             (sys.version.replace("\r", "").replace("\n", ""), \
-            platform.architecture()[0]))
-    print('My pid:               %s' % os.getpid())
-    print('-=' * 38)
+            platform.architecture()[0])))
+    print(('My pid:               %s' % os.getpid()))
+    print(('-=' * 38))
 
 
 def get_new_path(name) :

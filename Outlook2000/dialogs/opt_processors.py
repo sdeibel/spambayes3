@@ -9,9 +9,9 @@
 import win32gui, win32api, win32con
 import commctrl
 import struct, array
-from dlgutils import *
+from .dlgutils import *
 
-import processors
+from . import processors
 
 verbose = 0 # set to 1 to see option values fetched and set.
 
@@ -48,8 +48,8 @@ class OptionControlProcessor(processors.ControlProcessor):
         if option is None:
             option = self.option
         if verbose:
-            print "Setting option '%s' (%s) -> %s" % \
-                  (option.display_name(), option.name, value)
+            print(("Setting option '%s' (%s) -> %s" % \
+                  (option.display_name(), option.name, value)))
         option.set(value)
         self.NotifyOptionChanged(option)
     def GetOptionValue(self, option = None):
@@ -57,8 +57,8 @@ class OptionControlProcessor(processors.ControlProcessor):
             option = self.option
         ret = option.get()
         if verbose:
-            print "Got option '%s' (%s) -> %s" % \
-                  (option.display_name(), option.name, ret)
+            print(("Got option '%s' (%s) -> %s" % \
+                  (option.display_name(), option.name, ret)))
         return ret
 
     # Only sub-classes know how to update their controls from the value.
@@ -134,10 +134,10 @@ class ComboProcessor(OptionControlProcessor):
         OptionControlProcessor.__init__(self, window, control_ids, option)
         if text:
             temp = text.split(",")
-            self.option_to_text = zip(self.option.valid_input(), temp)
-            self.text_to_option = dict(zip(temp, self.option.valid_input()))
+            self.option_to_text = list(zip(self.option.valid_input(), temp))
+            self.text_to_option = dict(list(zip(temp, self.option.valid_input())))
         else:
-            self.option_to_text = zip(self.option.valid_input(),self.option.valid_input())
+            self.option_to_text = list(zip(self.option.valid_input(),self.option.valid_input()))
             self.text_to_option = dict(self.option_to_text)
 
     def OnCommand(self, wparam, lparam):
@@ -248,7 +248,7 @@ class EditNumberProcessor(OptionControlProcessor):
         str_val = buf[:nchars]
         val = float(str_val)
         if val < self.min_val or val > self.max_edit_val:
-            raise ValueError, "Value must be between %d and %d" % (self.min_val, self.max_val)
+            raise ValueError("Value must be between %d and %d" % (self.min_val, self.max_val))
         self.SetOptionValue(val)
 
 class FilenameProcessor(OptionControlProcessor):
@@ -263,7 +263,7 @@ class FilenameProcessor(OptionControlProcessor):
         return OptionControlProcessor.GetPopupHelpText(self, id)
 
     def DoBrowse(self):
-        from win32struct import OPENFILENAME
+        from .win32struct import OPENFILENAME
         ofn = OPENFILENAME(512)
         ofn.hwndOwner = self.window.hwnd
         ofn.setFilter(self.file_filter)

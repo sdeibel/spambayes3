@@ -73,7 +73,7 @@ class CompatibilityTestCase(unittest.TestCase):
 
         getTest = (f[1], f[2], f[3])
         if verbose:
-            print('%s %s %s' % getTest)
+            print(('%s %s %s' % getTest))
 
         self.assertEqual(getTest[1], b'quick', 'data mismatch!')
 
@@ -103,7 +103,7 @@ class CompatibilityTestCase(unittest.TestCase):
             if verbose:
                 print(rec)
             try:
-                rec = f.next()
+                rec = next(f)
             except KeyError:
                 break
 
@@ -117,7 +117,7 @@ class CompatibilityTestCase(unittest.TestCase):
 
     def do_bthash_test(self, factory, what):
         if verbose:
-            print('\nTesting: ', what)
+            print(('\nTesting: ', what))
 
         f = factory(self.filename, 'c')
         if verbose:
@@ -137,7 +137,7 @@ class CompatibilityTestCase(unittest.TestCase):
         # b'e' intentionally left out
         f[b'f'] = b'Python'
         if verbose:
-            print('%s %s %s' % (f[b'a'], f[b'b'], f[b'c']))
+            print(('%s %s %s' % (f[b'a'], f[b'b'], f[b'c'])))
 
         if verbose:
             print('key ordering...')
@@ -146,7 +146,7 @@ class CompatibilityTestCase(unittest.TestCase):
             self.fail("incorrect first() result: "+repr(start))
         while 1:
             try:
-                rec = f.next()
+                rec = next(f)
             except KeyError:
                 self.assertEqual(rec, f.last(), 'Error, last <> last!')
                 f.previous()
