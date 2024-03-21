@@ -54,7 +54,7 @@ with the following in .spambayesrc in your home directory:
 
 ```
 [Storage]
-persistent_use_database=True
+persistent_use_database=dbm
 persistent_storage_file=~/.hammiedb
 ```
 
@@ -82,24 +82,23 @@ script that does this for multiple users):
 
 ```
 #!/bin/bash
+export PYTHONPATH=/path/to/spambayes3
 /usr/local/bin/sb_mboxtrain.py -d /home/uname/.hammiedb -s /home/uname/mail/NEW-SPAM
 /usr/local/bin/sb_mboxtrain.py -d /home/uname/.hammiedb -g /home/uname/mail/NEW-HAM
 rm -f /home/uname/mail/NEW-SPAM /home/uname/mail/NEW-HAM
 touch /home/uname/mail/NEW-SPAM /home/uname/mail/NEW-HAM
-# If you're running this as root you will also need:
-chown uname /home/uname/mail/NEW-SPAM /home/uname/mail/NEW-HAM
-chgrp uname /home/uname/mail/NEW-SPAM /home/uname/mail/NEW-HAM
 ```
 
-If you want to run this using cron, this entry in /etc/cron.d would invoke it
-every 5 minutes:
+If you want to run this every 5 minutes with cron, create a crontab like this:
 
 ```
-0, 5,10,15,20,25,30,35,40,45,50,55 * * * * root /usr/local/bin/cronic /usr/local/bin/spambayes-train
+0,5,10,15,20,25,30,35,40,45,50,55 * * * * /usr/local/bin/cronic /path/to/spambayes-train
 ```
 
 This uses cronic to avoid sending emails with useless status information every
 five minutes.  A copy is included in this repository.
+
+Then do 'crontab crontab' to load it and 'crontab -l' to check it.
 
 Obviously, there are many other ways to configure this to run sb_mboxtrain.py.
 
