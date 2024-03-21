@@ -1,8 +1,19 @@
 # Spambayes3 - Python 3 version of spambayes
 
-Fork of an attempt to port spambayes to Python3.  I'm focused only on
-the smallish part that I use and have disabled unit tests for other
-things.
+Fork of an attempt to port spambayes to Python3. I'm not actually sure I've done
+much of use here, since I rushed in at first and then gave up after realizing a 
+lot of this is stuff neither I nor anyone else will ever use again.
+
+What I did:
+
+* Translated all the code with 2to3
+* Starting working through and fixing the unit tests
+
+After this I ran test_sb_filter.py using coverage to find out what it uses
+and realized I was overdoing it.
+
+I will commit any further changes if needed in getting my very minimal
+spambayes setup working.
 
 --
 
