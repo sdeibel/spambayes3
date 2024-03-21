@@ -209,7 +209,7 @@ class FileMessage(object):
         fp = gzip.open(pn, 'rb')
         try:
             self._msg = email.message_from_string(\
-                fp.read(), _class = self.message_class)
+                str(fp.read().decode('utf8')), _class = self.message_class)
         except IOError as e:
             if str(e) == 'Not a gzipped file' or \
                str(e) == 'Unknown compression method':
@@ -236,7 +236,7 @@ class FileMessage(object):
         if options["globals", "verbose"]:
             print(('storing', self.file_name))
 
-        fp = open(self.pathname(), 'wb')
+        fp = open(self.pathname(), 'w')
         fp.write(self.as_string())
         fp.close()
 
@@ -330,7 +330,7 @@ class GzipFileMessage(FileMessage):
 
         pn = self.pathname()
         gz = gzip.open(pn, 'wb')
-        gz.write(self.as_string())
+        gz.write(self.as_string().encode('utf-8'))
         gz.flush()
         gz.close()
 

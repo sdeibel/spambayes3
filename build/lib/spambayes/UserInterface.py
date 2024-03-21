@@ -73,7 +73,7 @@ import cgi
 import mailbox
 import types
 import io
-from email.Iterators import typed_subpart_iterator
+from email.iterators import typed_subpart_iterator
 from textwrap import wrap
 
 from spambayes import oe_mailbox

@@ -243,7 +243,7 @@ class DBDictClassifier(classifier.Classifier):
         self._write_state_key()
 
     def _wordinfoget(self, word):
-        if isinstance(word, str):
+        if isinstance(word, bytes):
             word = word.encode("utf-8")
         try:
             return self.wordinfo[word]
@@ -267,7 +267,7 @@ class DBDictClassifier(classifier.Classifier):
         # This seems to reduce the memory footprint of the DBDictClassifier by
         # as much as 60%!!!  This also has the effect of reducing the time it
         # takes to store the database
-        if isinstance(word, str):
+        if isinstance(word, bytes):
             word = word.encode("utf-8")
         if record.spamcount + record.hamcount <= 1:
             self.db[word] = record.__getstate__()
@@ -288,7 +288,7 @@ class DBDictClassifier(classifier.Classifier):
             self.changed_words[word] = WORD_CHANGED
 
     def _wordinfodel(self, word):
-        if isinstance(word, str):
+        if isinstance(word, bytes):
             word = word.encode("utf-8")
         del self.wordinfo[word]
         self.changed_words[word] = WORD_DELETED
@@ -386,7 +386,7 @@ class SQLClassifier(classifier.Classifier):
         return len(self.fetchall(c)) > 0
 
     def _wordinfoget(self, word):
-        if isinstance(word, str):
+        if isinstance(word, bytes):
             word = word.encode("utf-8")
 
         row = self._get_row(word)
@@ -398,12 +398,12 @@ class SQLClassifier(classifier.Classifier):
             return self.WordInfoClass()
 
     def _wordinfoset(self, word, record):
-        if isinstance(word, str):
+        if isinstance(word, bytes):
             word = word.encode("utf-8")
         self._set_row(word, record.spamcount, record.hamcount)
 
     def _wordinfodel(self, word):
-        if isinstance(word, str):
+        if isinstance(word, bytes):
             word = word.encode("utf-8")
         self._delete_row(word)
 
@@ -552,7 +552,7 @@ class mySQLClassifier(SQLClassifier):
             self.nham = 0
 
     def _wordinfoget(self, word):
-        if isinstance(word, str):
+        if isinstance(word, bytes):
             word = word.encode("utf-8")
 
         row = self._get_row(word)
@@ -627,7 +627,7 @@ class CDBClassifier(classifier.Classifier):
     def store(self):
         items = [(self.statekey, "%d,%d" % (self.nham, self.nspam))]
         for word, wi in self.wordinfo.items():
-            if isinstance(word, str):
+            if isinstance(word, bytes):
                 word = word.encode("utf-8")
             items.append((word, "%d,%d" % (wi.hamcount, wi.spamcount)))
         db = open(self.db_name, "wb")

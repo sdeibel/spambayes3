@@ -1,9 +1,21 @@
+About this Fork
+===============
+
+This is a tiny subset of spambayes ported to Python 3.  It contains only
+what's necessary to use spambayes with procmail.  The project has been
+long-defunct and thus in this fork everything not related to sb_filter.py
+and sb_mboxtrain.py has been removed, so it's easier to maintain what 
+is needed.
+
+The original readme text follows, but much of it is irrelevant.
+
+---
+
 Copyright (C) 2002-2007 Python Software Foundation; All Rights Reserved
 
 The Python Software Foundation (PSF) holds copyright on all material
 in this project.  You may use it under the terms of the PSF license;
 see LICENSE.txt.
-
 
 Overview
 ========

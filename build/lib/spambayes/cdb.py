@@ -163,12 +163,12 @@ def cdb_make(outfile, items):
     for key, value in items:
         outfile.write(uint32_pack(len(key)) + uint32_pack(len(value)))
         h = cdb_hash(key)
-        outfile.write(key)
-        outfile.write(value)
+        outfile.write(key.encode('utf-8'))
+        outfile.write(value.encode('utf-8'))
         tables.setdefault(h & 255, []).append((h, pos))
         pos += 8 + len(key) + len(value)
 
-    final = ''
+    final = b''
     # write hash tables
     for i in range(256):
         entries = tables.get(i, [])

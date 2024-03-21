@@ -1,7 +1,3 @@
-This directory contains a collection of spambayes applications/scripts.
-
-Each file within this directory should be executable, and perform a specific task
-(export the database, launch a POP3 proxy, and so on).
-
-To avoid polluting the end user's python/scripts directory when spambayes is installed,
-each script should be prefixed with 'sb_'.
+This directory contains a subset of the original spambayes scripts, just for
+running spambayes via procmail to filter out spam, and the mailbox trainer
+to train on user-selected emais that are either spam or ham.

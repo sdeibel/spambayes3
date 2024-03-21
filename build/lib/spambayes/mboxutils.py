@@ -25,7 +25,8 @@ import sys
 import glob
 import email
 import mailbox
-import email.Message
+import email.message
+import email.policy
 import re
 import traceback
 
@@ -120,7 +121,7 @@ def getmbox(name):
         from spambayes import Stats, message
         from spambayes.Options import options
         
-        session = IMAPSession(parts['server'])
+        sesion = IMAPSession(parts['server'])
         session.login(parts['user'], parts['pwd'])
         folder_list = session.folder_list()
         
@@ -129,7 +130,7 @@ def getmbox(name):
         else:
             names = parts['name'].split(',')
 
-        message_db = message.Message().message_info_db
+        message_db = message.message().message_info_db
         stats = Stats.Stats(options, message_db)
         mboxes = [IMAPFolder(n, session, stats) for n in names]
         
@@ -171,21 +172,23 @@ def get_message(obj):
     shouldn't matter.
     """
 
-    if isinstance(obj, email.Message.Message):
+    if isinstance(obj, email.message.EmailMessage):
         return obj
     # Create an email Message object.
     if hasattr(obj, "read"):
         obj = obj.read()
+    if not isinstance(obj, str):
+        obj = obj.as_string()
     try:
-        msg = email.message_from_string(obj)
-    except email.Errors.MessageParseError:
+        msg = email.message_from_string(obj ,policy=email.policy.default)
+    except email.errors.MessageParseError:
         # Wrap the raw text in a bare Message object.  Since the
         # headers are most likely damaged, we can't use the email
         # package to parse them, so just get rid of them first.
         headers = extract_headers(obj)
         obj = obj[len(headers):]
-        msg = email.Message.Message()
-        msg.set_payload(obj)
+        msg = email.message.EmailMessage()
+        msg.set_content(obj)
     return msg
 
 def as_string(msg, unixfrom=False):
@@ -195,7 +198,7 @@ def as_string(msg, unixfrom=False):
     TypeError for some malformed messages.  This catches that and attempts
     to return something approximating the original message.
 
-    To Do: This really should be done by subclassing email.Message.Message
+    To Do: This really should be done by subclassing email.message
     and making this function the as_string() method.  After 1.0.
 
     [Tony] Better: sb_filter & sb_mboxtrain should stop using this and
